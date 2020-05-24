@@ -2,18 +2,26 @@
 
 Simple Kafka 2.5.0 project 
 
-## Install and configs
-- Download stable version of kafka
+## Install
+
+- Download stable version of kafka from [here](https://kafka.apache.org/downloads)
 - mv ~/Downloads/kafka_2.12-2.5.0.tgz .
 - tar xvf kafka_2.12-2.5.0.tgz  
+
+Alternative on MAC:
+ - `brew install kafka` 
+ - to make following configs steps move to installation folder
+
+## Configs
 - cd kafka_2.12-2.5.0
 - mkdir data
 - mkdir data/zookeeper
 - mkdir data/kafka
 - nano config/server.properties 
-     => under Logs Basics to: log.dirs=/Users/mac-64/Documents/Learning/Kafka/kafka_2.12-2.5.0/data/kafka
-     => under Logs Basics to: num.partitions=3 // Default partition values to be created when we produce to a topic that doesn't exist
-- nano config/zookeeper.properties  => change the directory where the snapshot is stored: dataDir=/Users/mac-64/Documents/Learning/Kafka/kafka_2.12-2.5.0/data/zookeeper
+  - under Logs Basics to: log.dirs=/Users/mac-64/Documents/Learning/Kafka/kafka_2.12-2.5.0/data/kafka
+  - under Logs Basics to: num.partitions=3 // Default partition values to be created when we produce to a topic that doesn't exist
+- nano config/zookeeper.properties
+  - change the directory where the snapshot is stored: dataDir=/Users/mac-64/Documents/Learning/Kafka/kafka_2.12-2.5.0/data/zookeeper
 
 ## Start servers
 - START ZOOKEEPER: zookeeper-server-start.sh config/zookeeper.properties  
