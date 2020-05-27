@@ -159,3 +159,117 @@ my-first-app                   first_topic                    0          4
 my-first-app                   first_topic                    1          4              
 my-first-app                   first_topic                    2          4  
 ```
+
+## What is next...?
+
+Reference: [Producer vs Consumer vs Kafka Connect vs Kafka Streams vs KSQL](https://medium.com/@stephane.maarek/the-kafka-api-battle-producer-vs-consumer-vs-kafka-connect-vs-kafka-streams-vs-ksql-ef584274c1e)
+
+### Kafka Streams
+
+- `Definition:` Data processing and transformation JAVA library within Kafka
+- `Use cases:` Data transformations from **one topic to another**, data enrichment, fraud detection, monitoring and alerting
+- `Caracteristics`:
+  - Standard JAVA Application (no need another cluster to run)
+  - Highly scalable, elastic and fault tolerant
+  - One record at a time processing (no batch processing SPARK will do this)
+  - 
+
+
+
+### Kafka Registry
+
+- Confluent schema registry
+- Communicate with producers and consumers
+- Apache AVRO as data format instead of JSON (some learning curve)
+- `PROS:` Decrease size of payload of data sent to Kafka
+
+
+## GUIDELINES: Partitions, Replication factors and Cluster definition
+
+### Partitions guidelines
+
+- Each partition can handle a throughput of few MB/s
+- Number of partitions is the max numbers of **consumers** that we can have
+- More partitions implies:
+  - **PROS:**
+    - Better parallelism, therefor better throughput
+    - Leads to be able to use **more consumers**
+    - Create as many **brokers** as partitions to avoid idle brokers
+  **- CONS:**
+    - more elections to perform from ZOOKEEPER
+    - more files opened by KAFKA
+
+Guidelines:
+- How many **partitions** per **topic**?
+  - Small cluster (< 6 brokers) then number of Partitions = 2 x Brokers
+  - Big cluster (> 12 brokers) then number of Partitions = Brokers
+- How many consumers will i need to run in parallel on throughput peak time?
+  - If the number is 20 (as an example) then we should have 20 partitions, so each consumer have one partition to pull data from
+
+### Replication factors guidelines
+
+- Should be at least 2, recommended 3 and maximum 4
+- If we have `N` replication factors then:
+  - **PROS:** `N - 1` brokers can fail
+  - **CONS:** 
+    - Higher replication factor leads to more latency when `acks=all`
+    - Higher replication factor more disk usage needed
+
+Guidelines:
+- Always set it to 3 to get started (we need one broker for each replication factor)
+- If performance is an issue then improve brokers (servers) but **DO NOT** sacrifice replication factor
+- NEVER EVER set replication factor to 1
+
+### Clusters guidelines
+
+- A `Broker` should **NOT** hold more than 2K to 4K partitions (across all topics)
+- A `Cluster` **NOT** hold more than 20K partitions across all brokers. When leader goes down ZOOKEEPER must perform leader selection degrades performance
+- If we need more partitions then add more brokers
+- If we need more than 20K partitions then use NETFLIX model by adding more clusters
+
+### Producers guidelines
+
+ACKS=all must be used with `min.insync.replicas`.
+If we set `min.insync.replicas = 2` means that at least 2 brokers (leader + 1 ISR) must respond that they have the data sent.
+In this scenario if all ISR are down and only the leader receives the message then it will respond with **NotEnoughReplicasException** that needs to be **handled by producer**.
+
+In such case we can use `retries` setting:
+  - default to 0 on kafka <= 2.0
+  - default to max_int on kafka > 2.0
+And there is also `retry.backoff.ms` setting set to 100ms by default
+
+#### Idempotent Producer
+The producer can introduce duplicate messages due to retries when an ack from kafka did not reach the producer on time. Producer will send the same message twice.
+To solve this producer send an id set to each message and this way kafka knows that already have this message and it will only respond ack but NOT commit the message to the stream.
+
+To ensure order messaging, besides of `key` to deliver the message with same key to same partition, we need to set `max.in.flight.requests.per.connection = 1`. This might impact throughput but ensure ordering
+
+There's also a timeout called `delivery.timeout.ms` (defaults to 2 minutes) time the producer will expect a response after each request.
+
+#### Summary config to create a safe producer
+- ENABLE_IDEMPOTENCE_CONFIG: true
+- ACKS_CONFIG: all
+- RETRIES_CONFIG: MAX_INTEGER
+- MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION = 5 (set to 1 if ordering needs to be ensured)
+- LINGER.MS = 20ms (number of miliseconds to wait for more messages to be sent in a batch, saves requests. Default: 5ms)
+- BATCH.SIZE = 32KB (max number of bytes to be sent to kafka Default: 16KB)
+- COMPRESION_TYPE_CONFIG = [snappy](https://github.com/google/snappy)
+
+### Naming Convention
+
+[Reference to naming convention](https://riccomini.name/how-paint-bike-shed-kafka-topic-naming-conventions)
+
+## Case Studies
+
+**Scenario:**
+  - 3 brokers
+  - 1 topic
+  - 2 partitions
+  - 2 replication factor
+
+**Task 1:** Increase partition count after processing lifecycle already started
+**Effect 1:** Break key order guarantees among partitions
+
+**Task 2:** Increase replication factor after processing lifecycle already started
+**Effect 2:** Add more pressure to cluster to support this channge and will degrade performance or inestability
+
