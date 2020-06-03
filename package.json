@@ -1,0 +1,22 @@
+{
+  "name": "kafka",
+  "version": "0.0.1",
+  "description": "Kafka template",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ignacio-badiola/kafka.git"
+  },
+  "keywords": [
+    "kafka"
+  ],
+  "author": "Ignacio Badiola",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ignacio-badiola/kafka/issues"
+  },
+  "homepage": "https://github.com/ignacio-badiola/kafka#readme"
+}

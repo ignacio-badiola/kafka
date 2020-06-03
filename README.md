@@ -6,6 +6,15 @@ Simple Kafka 2.5.0 project
 
 Follow instructions from [kafka-setup](https://github.com/ignacio-badiola/kafka/wiki/Kafka-setup)
 
+### Install
+- Step 1: Install dependencies
+    ```
+    npm i
+    ```
+- Step 2: Start kafka and zookeeper from docker compose file:
+    ```
+    docker-compose -f docker/zookeeper-kafka.yml up
+    ```
 
 ## Optional kafka tools:
 - [Conduktor](https://www.conduktor.io/): a Kafka GUI, to make the development and management of Apache Kafka clusters as easy as possible
