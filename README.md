@@ -2,35 +2,15 @@
 
 Simple Kafka 2.5.0 project 
 
-## Install
+## Setup
 
-- Download stable version of kafka from [here](https://kafka.apache.org/downloads)
-- mv ~/Downloads/kafka_2.12-2.5.0.tgz .
-- tar xvf kafka_2.12-2.5.0.tgz  
+Follow instructions from [kafka-setup](https://github.com/ignacio-badiola/kafka/wiki/Kafka-setup)
 
-Alternative on MAC:
- - `brew install kafka` 
- - to make following configs steps move to installation folder
 
-### Optional installations:
+## Optional kafka tools:
 - [Conduktor](https://www.conduktor.io/): a Kafka GUI, to make the development and management of Apache Kafka clusters as easy as possible
 - [kafkacat](https://github.com/edenhill/kafkacat): open-source alternative to using the Kafka CLI
   - See post: [Debugging with kafkacat](https://medium.com/@coderunner/debugging-with-kafkacat-df7851d21968)
-## Configs
-Step into the folder where kafka was installed/extracted:
-
-- mkdir data
-- mkdir data/zookeeper
-- mkdir data/kafka
-- nano config/server.properties 
-  - under Logs Basics to: log.dirs=/Users/mac-64/Documents/Learning/Kafka/kafka_2.12-2.5.0/data/kafka
-  - under Logs Basics to: num.partitions=3 // Default partition values to be created when we produce to a topic that doesn't exist
-- nano config/zookeeper.properties
-  - change the directory where the snapshot is stored: dataDir=/Users/mac-64/Documents/Learning/Kafka/kafka_2.12-2.5.0/data/zookeeper
-
-## Start servers
-- START ZOOKEEPER: `zookeeper-server-start.sh config/zookeeper.properties`
-- START KAFKA: `kafka-server-start.sh config/server.properties`
 
 ## Work with TOPIC
 - CREATE A TOPIC: `kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --create --partitions 3 --replication-factor 1`
@@ -272,4 +252,3 @@ There's also a timeout called `delivery.timeout.ms` (defaults to 2 minutes) time
 
 **Task 2:** Increase replication factor after processing lifecycle already started
 **Effect 2:** Add more pressure to cluster to support this channge and will degrade performance or inestability
-
