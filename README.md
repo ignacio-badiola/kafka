@@ -1,6 +1,6 @@
 # Description
 
-Simple Kafka 2.5.0 project 
+Kafka 2.5.0 project 
 
 ## Setup
 
